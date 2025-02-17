@@ -1,5 +1,5 @@
 # Agentflow
-notebook with agentic workflow
+agentic workflow with langgraph
 
 Package Specs:
 - streamlit

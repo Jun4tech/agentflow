@@ -1,10 +1,11 @@
 [project]
 name = "agentflow"
 version = "0.1.0"
-description = "Add your description here"
+description = "Agentic flow with langgraph"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "fastapi[standard]>=0.115.8",
     "langchain-anthropic>=0.3.7",
     "langchain-openai>=0.3.6",
     "langgraph>=0.2.73",

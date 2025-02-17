@@ -14,7 +14,7 @@ class State(TypedDict):
 class LLM:
     def __init__(self, model: str):
         self.model = model
-        api_key = os.environ["OPENAI_API_KEY"]
+        api_key = os.environ.get("OPENAI_API_KEY")
         self.llm = ChatOpenAI(
             api_key=api_key,
             model=model,
@@ -53,9 +53,3 @@ def main():
             print("User: " + user_input)
             stream_graph_updates(user_input)
             break
-
-
-
-
-if __name__ == "__main__":
-    main()
