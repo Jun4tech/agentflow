@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import os
 from typing import Annotated
 from typing_extensions import TypedDict
@@ -7,6 +8,10 @@ from langgraph.graph.message import add_messages
 
 from langchain_openai import ChatOpenAI
 
+from tools import toolbox
+
+load_dotenv()
+
 class State(TypedDict):
     messages: Annotated[list, add_messages]
 
@@ -14,17 +19,18 @@ class State(TypedDict):
 class LLM:
     def __init__(self, model: str):
         self.model = model
-        api_key = os.environ.get("OPENAI_API_KEY")
-        self.llm = ChatOpenAI(
+        api_key = os.getenv("OPENAI_API_KEY")
+        llm = ChatOpenAI(
             api_key=api_key,
             model=model,
             temperature=0,
             max_tokens=None,
             timeout=None
         )
+        self.llm_with_tools = llm.bind_tools(toolbox())
 
     def chatbot(self, state: State):
-        return {"messages": [self.llm.invoke(state["messages"])]}
+        return {"messages": [self.llm_with_tools.invoke(state["messages"])]}
 
 def stream_graph_updates(user_input: str, graph):
     for event in graph.stream({"messages": [{"role": "user", "content": user_input}]}):

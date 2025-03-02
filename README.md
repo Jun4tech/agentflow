@@ -8,6 +8,8 @@ Package Specs:
 - langgraph
 - langchain
 - langsmith
+- langfuse
+- tavily-python
 
 LLM Support:
 - OpenAPI
