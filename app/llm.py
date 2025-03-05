@@ -6,9 +6,12 @@ from typing_extensions import TypedDict
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 
-from langchain_openai import ChatOpenAI
-
+#memory saver
+from langgraph.checkpoint.memory import MemorySaver
 from tools import toolbox
+
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import ToolNode, tools_condition
 
 load_dotenv()
 
@@ -40,9 +43,13 @@ def stream_graph_updates(user_input: str, graph):
 def main():
     graph_builder = StateGraph(State)
     llm = LLM('gpt-4o')
+
+    tool_node = ToolNode(tools= toolbox())
+    graph_builder.add_node("tools", tool_node)
     graph_builder.add_node("chatbot", llm.chatbot)
     graph_builder.add_edge(START, "chatbot")
-    graph_builder.add_edge("chatbot", END)
+    graph_builder.add_conditional_edges("chatbot", tools_condition)
+    graph_builder.add_edge("tools", "chatbot")
     graph = graph_builder.compile()
 
     while True:
