@@ -11,5 +11,6 @@ dependencies = [
     "langchain-openai>=0.3.6",
     "langgraph>=0.2.73",
     "langsmith>=0.3.8",
+    "pydantic>=2.10.6",
     "tavily-python>=0.5.1",
 ]
