@@ -7,9 +7,10 @@ Package Specs:
 - pydantic
 - langgraph
 - langchain
-- langsmith
+- langsmith ?
 - langfuse
 - tavily-python
 
 LLM Support:
 - OpenAPI
+- Ollama

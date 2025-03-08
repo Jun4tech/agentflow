@@ -1,8 +1,19 @@
+from typing import Optional
 from fastapi import APIRouter
+from fastapi.responses import StreamingResponse
+from agents.schemas import UserInput
+from agents.services import get_agent, get_stream_output
 
 router = APIRouter(prefix="/api")
 
-@router.get("/")
-async def test_api():
-    return {"message": "Hello World"}
+@router.post("/stream")
+async def stream(input: UserInput, agent_name:Optional[str] = "search_agent") -> StreamingResponse:
+    """
+    Stream output of Agent
+    """
+    agent = get_agent(agent_name)
 
+    return StreamingResponse(
+        get_stream_output(input.message, agent),
+        media_type="text/event-stream"
+    )
