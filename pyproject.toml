@@ -12,5 +12,6 @@ dependencies = [
     "langgraph>=0.2.73",
     "langsmith>=0.3.8",
     "pydantic>=2.10.6",
+    "streamlit>=1.43.2",
     "tavily-python>=0.5.1",
 ]

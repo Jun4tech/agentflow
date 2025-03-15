@@ -24,12 +24,12 @@ def get_agent(agent_name: str) -> CompiledStateGraph:
 
 async def get_stream_output(user_input: str, agent: CompiledStateGraph) -> AsyncGenerator[str, None]:
     """
-    Get stream output
+    Get stream output from agent
     """
     async for event in agent.astream(
         {"messages": [{"role": "user", "content": user_input}]},
         stream_mode="updates"
         ):
         for value in event.values():
-            print(f"Assistant:, {value["messages"][-1].content}")
-            yield f"Assistant:, {value["messages"][-1].content}"
+            yield f"Assistant: {value["messages"][-1].content}"
+        

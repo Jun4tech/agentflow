@@ -4,5 +4,5 @@ class UserInput(BaseModel):
     """ Basic user input for agent"""
     message: str = Field(
         description="Message to the agent",
-        example = "What is the weather today?"
+        example = "What is the whether today in malaysia?"
     )

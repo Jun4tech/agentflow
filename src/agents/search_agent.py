@@ -26,7 +26,8 @@ class LLM:
             model=model,
             temperature=0,
             max_tokens=None,
-            timeout=None
+            timeout=None,
+            streaming=True
         )
         self.llm_with_tools = llm.bind_tools(toolbox())
 

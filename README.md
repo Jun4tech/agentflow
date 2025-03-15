@@ -1,5 +1,5 @@
 # Agentflow
-agentic workflow with langgraph
+Agentic workflow
 
 Package Specs:
 - streamlit
@@ -7,10 +7,9 @@ Package Specs:
 - pydantic
 - langgraph
 - langchain
-- langsmith ?
-- langfuse
+
+Tools Support:
 - tavily-python
 
 LLM Support:
 - OpenAPI
-- Ollama
