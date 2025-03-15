@@ -1,6 +1,7 @@
 import streamlit as st
 import time
-import httpx  
+import httpx 
+import json
 
 st.title("Welcome to workflow assistant")
 
@@ -35,7 +36,15 @@ if prompt := st.chat_input("Ask Assistant"):
             ) as response:
                 response.raise_for_status()
                 for chunk in response.iter_text():
-                    full_response += chunk
+                    data = json.loads(chunk[5:])  # Remove "data: " prefix and parse JSON should be handled
+                    if data["type"] == "web_search":
+                        full_response += "Let me find information from the web...\n\n"
+                    elif data["type"] == "web_result":
+                        urls = [result["url"] for result in json.loads(data["content"])]
+                        full_response += "I Found below sources for my reference: \n"
+                        full_response += "\n".join(urls) + "\n\n"
+                    else:
+                        full_response += f"{data["content"]} "
                     time.sleep(0.05)
                     message_placeholder.markdown(full_response)
         except Exception as e:
