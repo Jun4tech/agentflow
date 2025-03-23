@@ -6,14 +6,16 @@ from agents.services import get_agent, get_stream_output
 
 router = APIRouter(prefix="/api")
 
+
 @router.post("/stream")
-async def stream(input: UserInput, agent_name:Optional[str] = "search_agent") -> StreamingResponse:
+async def stream(
+    input: UserInput, agent_name: Optional[str] = "search_agent"
+) -> StreamingResponse:
     """
     Stream output of Agent
     """
-    agent = get_agent(agent_name)
+    agent = get_agent(agent_name or "search_agent")
 
     return StreamingResponse(
-        get_stream_output(input.message, agent),
-        media_type="text/event-stream"
+        get_stream_output(input.message, agent), media_type="text/event-stream"
     )
