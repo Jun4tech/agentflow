@@ -2,12 +2,15 @@ from pydantic import BaseModel, Field
 from typing import Any, Literal, NotRequired
 from typing_extensions import TypedDict
 
+
 class UserInput(BaseModel):
-    """ Basic user input for agent"""
+    """Basic user input for agent"""
+
     message: str = Field(
         description="Message to the agent",
-        example = "What is the whether today in malaysia?"
+        examples=["What is the weather today in Malaysia?"],
     )
+
 
 class ToolCall(TypedDict):
     """Represents a request to call a tool."""
@@ -19,6 +22,7 @@ class ToolCall(TypedDict):
     id: str | None
     """An identifier associated with the tool call."""
     type: NotRequired[Literal["tool_call"]]
+
 
 class ChatMessage(BaseModel):
     """Message in a chat."""

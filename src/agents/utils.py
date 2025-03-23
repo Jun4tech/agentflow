@@ -10,6 +10,7 @@ from langchain_core.messages import (
 
 from agents.schemas import ChatMessage
 
+
 def convert_message_content_to_string(content: str | list[str | dict]) -> str:
     if isinstance(content, str):
         return content
@@ -21,6 +22,7 @@ def convert_message_content_to_string(content: str | list[str | dict]) -> str:
         if content_item["type"] == "text":
             text.append(content_item["text"])
     return "".join(text)
+
 
 def langchain_to_chat_message(message: BaseMessage) -> ChatMessage:
     """Create a ChatMessage from a LangChain message."""
@@ -50,12 +52,15 @@ def langchain_to_chat_message(message: BaseMessage) -> ChatMessage:
             return tool_message
         case LangchainChatMessage():
             if message.role == "custom":
-                custom_message = ChatMessage(
-                    type="custom",
-                    content="",
-                    custom_data=message.content[0],
-                )
-                return custom_message
+                if isinstance(message.content[0], dict):
+                    custom_message = ChatMessage(
+                        type="custom",
+                        content="",
+                        custom_data=message.content[0],
+                    )
+                    return custom_message
+                else:
+                    raise ValueError("Expected custom_data to be a dictionary.")
             else:
                 raise ValueError(f"Unsupported chat message role: {message.role}")
         case _:
