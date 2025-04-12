@@ -8,10 +8,11 @@ from langgraph.graph.message import add_messages
 # memory saver
 from tools.tools import toolbox
 
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama
 from langgraph.prebuilt import ToolNode, tools_condition
 
-from langchain_core.utils import secret_from_env
+# from langchain_core.utils import secret_from_env
 
 load_dotenv()
 
@@ -23,13 +24,16 @@ class State(TypedDict):
 class LLM:
     def __init__(self, model: str):
         self.model = model
-        llm = ChatOpenAI(
-            api_key=secret_from_env("OPENAI_API_KEY")(),
-            model=model,
-            temperature=0,
-            timeout=None,
-            streaming=True,
-        )
+        # TBC: Include multimodal functionality
+        # llm = ChatOpenAI(
+        #     api_key=secret_from_env("OPENAI_API_KEY")(),
+        #     model=model,
+        #     temperature=0,
+        #     timeout=None,
+        #     streaming=True,
+        # )
+
+        llm = ChatOllama(model=model, temperature=0)
         self.llm_with_tools = llm.bind_tools(toolbox())
 
     def chatbot(self, state: State):
@@ -37,10 +41,13 @@ class LLM:
 
 
 graph_builder = StateGraph(State)
-llm = LLM("gpt-4o")
+# TBC: Include multimodal functionality
+# llm = LLM("gpt-4o")
+llm = LLM("deepseek-r1:14B")
 tool_node = ToolNode(tools=toolbox())
 graph_builder.add_node("tools", tool_node)
 graph_builder.add_node("chatbot", llm.chatbot)
+
 graph_builder.add_edge(START, "chatbot")
 graph_builder.add_conditional_edges("chatbot", tools_condition)
 graph_builder.add_edge("tools", "chatbot")

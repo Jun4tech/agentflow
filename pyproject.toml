@@ -8,6 +8,7 @@ dependencies = [
     "fastapi[standard]>=0.115.8",
     "langchain-anthropic>=0.3.7",
     "langchain-community>=0.3.17",
+    "langchain-ollama>=0.3.0",
     "langchain-openai>=0.3.6",
     "langgraph>=0.2.73",
     "langsmith>=0.3.8",
