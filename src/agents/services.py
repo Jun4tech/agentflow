@@ -5,6 +5,7 @@ from agents.search_agent import web_agent
 from agents.utils import langchain_to_chat_message
 import json
 
+
 @dataclass
 class Agent:
     description: str
@@ -13,10 +14,10 @@ class Agent:
 
 agent_dict = {
     "search_agent": Agent(
-        description="agent that searches info from the web",
-        graph = web_agent
+        description="agent that searches info from the web", graph=web_agent
     )
 }
+
 
 def get_agent(agent_name: str) -> CompiledStateGraph:
     """
@@ -24,22 +25,26 @@ def get_agent(agent_name: str) -> CompiledStateGraph:
     """
     return agent_dict[agent_name].graph
 
-#TBC: enchance to maintain state message
-async def get_stream_output(user_input: str, agent: CompiledStateGraph) -> AsyncGenerator[str, None]:
+
+# TBC: enchance to maintain state message
+async def get_stream_output(
+    user_input: str, agent: CompiledStateGraph
+) -> AsyncGenerator[str, None]:
     """
     Get stream output from agent
     """
 
     async for event in agent.astream(
         {"messages": [{"role": "user", "content": user_input}]},
-        stream_mode="updates"
-        ):
+        # TBC: to be replaced with a more generic way to get the thread id
+        {"configurable": {"thread_id": "1"}},
+        stream_mode="updates",
+    ):
         for value in event.values():
             output = langchain_to_chat_message(value["messages"][-1])
             if output.type == "ai" and len(output.tool_calls) > 0:
-                yield f"data: {json.dumps({'type': 'web_search', 'content':'Let me find information from the web...'})}\n\n"
+                yield f"data: {json.dumps({'type': 'web_search', 'content': 'Let me find information from the web...'})}\n\n"
             elif output.type == "tool":
-                yield f"data: {json.dumps({'type': 'web_result', 'content':f"{output.content}"})}\n\n"
+                yield f"data: {json.dumps({'type': 'web_result', 'content': f'{output.content}'})}\n\n"
             else:
-                yield f"data: {json.dumps({'type': 'agent_response', 'content':f"{output.content}"})}\n\n"
-
+                yield f"data: {json.dumps({'type': 'agent_response', 'content': f'{output.content}'})}\n\n"
