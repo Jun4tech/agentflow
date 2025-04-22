@@ -9,6 +9,7 @@ from langchain_core.messages import (
 )
 
 from agents.schemas import ChatMessage
+import re
 
 
 def convert_message_content_to_string(content: str | list[str | dict]) -> str:
@@ -65,3 +66,17 @@ def langchain_to_chat_message(message: BaseMessage) -> ChatMessage:
                 raise ValueError(f"Unsupported chat message role: {message.role}")
         case _:
             raise ValueError(f"Unsupported message type: {message.__class__.__name__}")
+
+
+def extract_deepseek_response_from_tag(tag: str, response: str) -> str:
+    """
+    Extract the deepseek response from the <deepseek> tag
+    """
+    result = response.split("</think>")[1]
+    pattern = rf"<{tag}>(.*?)</{tag}>"
+    match = re.search(pattern, response, re.DOTALL)
+    if match:
+        extracted_content = match.group(1).strip()
+        return extracted_content
+
+    return result

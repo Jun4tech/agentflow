@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from langgraph.graph.state import CompiledStateGraph
 from collections.abc import AsyncGenerator
-from agents.search_agent import web_agent
+from agents.search_agent import search_graph
+from agents.data_analysis_agent import data_analysis_graph
 from agents.utils import langchain_to_chat_message
 import json
 
@@ -14,8 +15,11 @@ class Agent:
 
 agent_dict = {
     "search_agent": Agent(
-        description="agent that searches info from the web", graph=web_agent
-    )
+        description="agent that searches info from the web", graph=search_graph
+    ),
+    "data_analysis_agent": Agent(
+        description="agent that analyzes data", graph=data_analysis_graph
+    ),
 }
 
 
@@ -41,10 +45,14 @@ async def get_stream_output(
         stream_mode="updates",
     ):
         for value in event.values():
-            output = langchain_to_chat_message(value["messages"][-1])
-            if output.type == "ai" and len(output.tool_calls) > 0:
-                yield f"data: {json.dumps({'type': 'web_search', 'content': 'Let me find information from the web...'})}\n\n"
-            elif output.type == "tool":
-                yield f"data: {json.dumps({'type': 'web_result', 'content': f'{output.content}'})}\n\n"
+            if "messages" in value and value["messages"]:
+                output = langchain_to_chat_message(value["messages"][-1])
+
+                if output.type == "ai" and len(output.tool_calls) > 0:
+                    yield f"data: {json.dumps({'type': 'web_search', 'content': 'Let me find information from the web...'})}\n\n"
+                elif output.type == "tool":
+                    yield f"data: {json.dumps({'type': 'web_result', 'content': f'{output.content}'})}\n\n"
+                else:
+                    yield f"data: {json.dumps({'type': 'agent_response', 'content': f'{output.content}'})}\n\n"
             else:
-                yield f"data: {json.dumps({'type': 'agent_response', 'content': f'{output.content}'})}\n\n"
+                yield f"data: {json.dumps({'type': 'agent_processes', 'content': 'Agent using tools..'})}\n\n"
