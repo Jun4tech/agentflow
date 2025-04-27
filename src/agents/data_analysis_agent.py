@@ -75,10 +75,12 @@ def generate_sql_based_on_schema(state: State):
     Generate SQL query based on the schema
     """
     sys_prompt = f"""
+        Do not give any explanation, only give the SQL query.
         Please generate the SQL query to help answer the question of "{state["messages"][0].text()}"
         with given schema of the tables ({state["tablename_result"]}):
-        {state["tables_schema"]}       
-        Please make sure to return the suggested SQL Query wrapped in <sql> tags.
+        {state["tables_schema"]}
+        TotalExpenses : Total amount of expenses
+        Please make sure the generated SQL Query wrapped around <sql> and </sql> tags.
         For example:<sql>SELECT * FROM your_table</sql>
     """
 
