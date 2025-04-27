@@ -7,7 +7,7 @@ from langchain_core.messages import (
 from langchain_core.messages import (
     ChatMessage as LangchainChatMessage,
 )
-
+from typing import Optional
 from agents.schemas import ChatMessage
 import re
 
@@ -68,11 +68,14 @@ def langchain_to_chat_message(message: BaseMessage) -> ChatMessage:
             raise ValueError(f"Unsupported message type: {message.__class__.__name__}")
 
 
-def extract_deepseek_response_from_tag(tag: str, response: str) -> str:
+def extract_deepseek_response_from_tag(response: str, tag: Optional[str] = None) -> str:
     """
     Extract the deepseek response from the <deepseek> tag
     """
     result = response.split("</think>")[1]
+    print(f"Result: {result}")
+    if tag is None:
+        return result
     pattern = rf"<{tag}>(.*?)</{tag}>"
     match = re.search(pattern, response, re.DOTALL)
     if match:

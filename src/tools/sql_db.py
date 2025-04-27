@@ -54,7 +54,7 @@ def describe_tables_schema(table_names: str) -> List[Dict[str, Any]]:
     db._connect()
     # split table names by comma and include "" to each table name
     table_names = ",".join([f"'{table.strip()}'" for table in table_names.split(",")])
-    query = f"SELECT COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME IN ({table_names});"
+    query = f"SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME IN ({table_names});"
     print(query)
     results = db._execute_query(query)
     db._close_connection()

@@ -1,4 +1,3 @@
-from pyexpat.errors import messages
 from langchain_ollama import ChatOllama
 from dotenv import load_dotenv
 from src.tools.sql_db import describe_tables_schema, execute_sql_query
@@ -54,11 +53,8 @@ def identify_table_from_input(state: State):
 
     resoning_llm = ChatOllama(model="deepseek-r1:14B", temperature=0)
     response = resoning_llm.invoke(prompt)
-    result = extract_deepseek_response_from_tag("table", str(response.content))
-    return {
-        "tablename_result": result,
-        "messages": [response],
-    }
+    result = extract_deepseek_response_from_tag(str(response.content), tag="table")
+    return {"tablename_result": result}
 
 
 def get_tables_schema(state: State):
@@ -78,12 +74,11 @@ def generate_sql_based_on_schema(state: State):
     """
     Generate SQL query based on the schema
     """
-
     sys_prompt = f"""
-        Always referring to the schema of the table below:
-        {state["tables_schema"]}
         Please generate the SQL query to help answer the question of "{state["messages"][0].text()}"
-        Please return the result of SQL Query wrapped in <sql> tags.
+        with given schema of the tables ({state["tablename_result"]}):
+        {state["tables_schema"]}       
+        Please make sure to return the suggested SQL Query wrapped in <sql> tags.
         For example:<sql>SELECT * FROM your_table</sql>
     """
 
@@ -96,10 +91,8 @@ def generate_sql_based_on_schema(state: State):
 
     resoning_llm = ChatOllama(model="deepseek-r1:14B", temperature=0)
     response = resoning_llm.invoke(prompt)
-    print(str(response.content))
-    result = extract_deepseek_response_from_tag("sql", str(response.content))
-    print(result)
-    return {"sql_query": result, "messages": [response]}
+    result = extract_deepseek_response_from_tag(str(response.content), tag="sql")
+    return {"sql_query": result}
 
 
 def get_sql_query_result(state: State):
@@ -143,10 +136,12 @@ def summarize_result(state: State):
 
     resoning_llm = ChatOllama(model="deepseek-r1:14B", temperature=0)
     response = resoning_llm.invoke(prompt)
+    response.content = extract_deepseek_response_from_tag(
+        response=str(response.content)
+    )
     return {"messages": [response]}
 
 
-llm = DataAnalystLLM("deepseek-r1:14B")
 graph_builder = StateGraph(State)
 graph_builder.add_node("identify_table_from_input", identify_table_from_input)
 graph_builder.add_node("get_tables_schema", get_tables_schema)

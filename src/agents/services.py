@@ -55,4 +55,4 @@ async def get_stream_output(
                 else:
                     yield f"data: {json.dumps({'type': 'agent_response', 'content': f'{output.content}'})}\n\n"
             else:
-                yield f"data: {json.dumps({'type': 'agent_processes', 'content': 'Agent using tools..'})}\n\n"
+                pass
