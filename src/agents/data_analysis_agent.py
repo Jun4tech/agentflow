@@ -80,11 +80,11 @@ def generate_sql_based_on_schema(state: State):
     user_input = state["messages"][0].text()
 
     sys_prompt = f"""
-    Please generate a SQL query to help answer following question:"{user_input}" based on the columns available below:
+    Please generate T-SQL query to help answer following question:"{user_input}" based on the columns available below:
     Schema of the tables ({state["tablename_result"]}):
     {state["tables_schema"]}
     <instruct>
-    Please make sure the generated SQL Query wrapped around <sql> and </sql> tags.
+    Please make sure the generated T-SQL wrapped around <sql> and </sql> tags.
     For example:<sql>SELECT * FROM your_table</sql>
     </instruct>
     """
@@ -161,4 +161,5 @@ graph_builder.add_edge("get_tables_schema", "generate_sql_based_on_schema")
 graph_builder.add_edge("generate_sql_based_on_schema", "get_sql_query_result")
 graph_builder.add_edge("get_sql_query_result", "summarize_result")
 graph_builder.add_edge("summarize_result", END)
-data_analysis_graph = graph_builder.compile(checkpointer=memory)
+# TBC: include memory saver to record the conversation but clear the memory after each run
+data_analysis_graph = graph_builder.compile()
