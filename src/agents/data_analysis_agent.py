@@ -35,23 +35,25 @@ def identify_table_from_input(state: State):
     Identify the interested table related to user input
     """
 
+    # TBC: include CAG or RAG depending on the topic of increasing volume
     sys_prompt = """
-        Given table name, along with the description of the table below:
-        sys_expense_master: Contains the master data of all expenses
-        sys_expense_detail: Contains the detail data of all expenses
-        Please identifies tables which the query might be related to.
-        Please return the result of identified tables wrapped in <table> tags.
-        For example:<table>sys_expense_master,syn_expense_detail</table>
+    Given available table with description of store data below:
+    v_dim_user: Contains user information.
+    v_fact_expenses: Contains the detail of all expenses related.
+    Please identifies tables which the query might be related to.
+    <instruct>
+    Please return the result of identified tables wrapped in <table> tags.
+    For example:<table>sys_expense_master,syn_expense_detail</table>
+    </instruct>
     """
 
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", sys_prompt),
-            ("user", "{messages}"),
+            ("user", "{messages}\n{sys_prompt}"),
         ]
-    ).format_prompt(messages=state["messages"])
+    ).format_prompt(messages=state["messages"][0].text(), sys_prompt=sys_prompt)
 
-    resoning_llm = ChatOllama(model="deepseek-r1:14B", temperature=0)
+    resoning_llm = ChatOllama(model="deepseek-r1:14B", temperature=0.6, top_p=0.95)
     response = resoning_llm.invoke(prompt)
     result = extract_deepseek_response_from_tag(str(response.content), tag="table")
     return {"tablename_result": result}
@@ -65,7 +67,7 @@ def get_tables_schema(state: State):
     result = describe_tables_schema(state["tablename_result"])
     result_str = ""
     for item in result:
-        result_str += f"{item['COLUMN_NAME']} : {item['DATA_TYPE']}, "
+        result_str += f"table_name: {item['TABLE_NAME']}, column_name: {item['COLUMN_NAME']}, data_type: {item['DATA_TYPE']}\n "
 
     return {"tables_schema": result_str}
 
@@ -74,24 +76,26 @@ def generate_sql_based_on_schema(state: State):
     """
     Generate SQL query based on the schema
     """
+
+    user_input = state["messages"][0].text()
+
     sys_prompt = f"""
-        Do not give any explanation, only give the SQL query.
-        Please generate the SQL query to help answer the question of "{state["messages"][0].text()}"
-        with given schema of the tables ({state["tablename_result"]}):
-        {state["tables_schema"]}
-        TotalExpenses : Total amount of expenses
-        Please make sure the generated SQL Query wrapped around <sql> and </sql> tags.
-        For example:<sql>SELECT * FROM your_table</sql>
+    Please generate a SQL query to help answer following question:"{user_input}" based on the columns available below:
+    Schema of the tables ({state["tablename_result"]}):
+    {state["tables_schema"]}
+    <instruct>
+    Please make sure the generated SQL Query wrapped around <sql> and </sql> tags.
+    For example:<sql>SELECT * FROM your_table</sql>
+    </instruct>
     """
 
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", sys_prompt),
-            ("user", "{messages}"),
+            ("user", "{sys_prompt}"),
         ]
-    ).format_prompt(messages=state["messages"])
+    ).format_prompt(sys_prompt=sys_prompt)
 
-    resoning_llm = ChatOllama(model="deepseek-r1:14B", temperature=0)
+    resoning_llm = ChatOllama(model="deepseek-r1:14B", temperature=0.6, top_p=0.95)
     response = resoning_llm.invoke(prompt)
     result = extract_deepseek_response_from_tag(str(response.content), tag="sql")
     return {"sql_query": result}
@@ -101,8 +105,6 @@ def get_sql_query_result(state: State):
     """
     Execute the SQL query and return the result
     """
-
-    print(f"SQL Query: {state['sql_query']}")
     results = execute_sql_query(state["sql_query"])
     # convert the result to string
     result_str = ""
@@ -113,7 +115,6 @@ def get_sql_query_result(state: State):
     # if the result is empty, return empty string
     if not result_str:
         result_str = "No result found"
-    print(result_str)
     return {"sql_result": result_str}
 
 
@@ -122,21 +123,24 @@ def summarize_result(state: State):
     Summarize the result of SQL query
     """
 
+    user_input = state["messages"][0].text()
+
     sys_prompt = f"""
-        Please answer the question of "{state["messages"][0].text()}"
-        based on the data below:
-        {state["sql_result"]}
-        Please give an answer in a concise and clear manner.
+    <instruct>
+    Please answer the question of "{user_input}"
+    based on the data below:
+    {state["sql_result"]}
+    Please give an answer in a concise and clear manner.
+    </instruct>
     """
 
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", sys_prompt),
-            ("user", "{messages}"),
+            ("user", "{sys_prompt}"),
         ]
-    ).format_prompt(messages=state["messages"])
+    ).format_prompt(sys_prompt=sys_prompt)
 
-    resoning_llm = ChatOllama(model="deepseek-r1:14B", temperature=0)
+    resoning_llm = ChatOllama(model="deepseek-r1:14B", temperature=0.6, top_p=0.95)
     response = resoning_llm.invoke(prompt)
     response.content = extract_deepseek_response_from_tag(
         response=str(response.content)

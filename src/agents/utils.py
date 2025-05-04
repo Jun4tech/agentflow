@@ -73,7 +73,6 @@ def extract_deepseek_response_from_tag(response: str, tag: Optional[str] = None)
     Extract the deepseek response from the <deepseek> tag
     """
     result = response.split("</think>")[1]
-    print(f"Result: {result}")
     if tag is None:
         return result
     pattern = rf"<{tag}>(.*?)</{tag}>"

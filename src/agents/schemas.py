@@ -8,7 +8,7 @@ class UserInput(BaseModel):
 
     message: str = Field(
         description="Message to the agent",
-        examples=["What is the weather today in Malaysia?"],
+        examples=["Who are the top spends in the past 3 months?"],
     )
 
 

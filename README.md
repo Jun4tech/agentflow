@@ -10,10 +10,14 @@ Package Specs:
 
 Tools Support:
 - tavily-python
+- MSSQL
 
 LLM Support:
 - OpenAPI
-- DeepSeekt not with bind tools
+- DeepSeekt-r1 (exclude with bind tools)
+
+LLM Ops:
+- Langsmith
 
 # Docker Setup
 To start running in local would need to spin up docker with
