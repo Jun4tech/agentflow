@@ -5,6 +5,7 @@ description = "Agentic flow with langgraph"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "cohere>=5.15.0",
     "fastapi[standard]>=0.115.8",
     "langchain-anthropic>=0.3.7",
     "langchain-community>=0.3.17",
@@ -12,8 +13,10 @@ dependencies = [
     "langchain-openai>=0.3.6",
     "langgraph>=0.2.73",
     "langsmith>=0.3.8",
+    "psycopg2>=2.9.10",
     "pydantic>=2.10.6",
     "pyodbc>=5.2.0",
     "streamlit>=1.43.2",
     "tavily-python>=0.5.1",
+    "timescale-vector>=0.0.7",
 ]

@@ -19,6 +19,15 @@ LLM Support:
 LLM Ops:
 - Langsmith
 
+RAG:
+- pgvectorscale
+https://github.com/timescale/pgvectorscale
+-https://python.langchain.com/docs/integrations/vectorstores/timescalevector/#what-is-timescale-vector
+
+Prequsite:
+- apt-get update && apt-get install -y libpq-dev
+- sudo apt-get install python3-dev
+
 # Docker Setup
 To start running in local would need to spin up docker with
 ```

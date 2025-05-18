@@ -1,0 +1,10 @@
+table_name;column_name;data_type;description;category
+v_dim_user;UserId;nvarchar;id for user table; UserInfo
+v_dim_user;FullName;nvarchar; full name of user; UserInfo
+v_dim_user;UserEmail;nvarchar; email of user; UserInfo
+v_fact_expenses;UserEmail;nvarchar; email of user and key column to join with user table; Expenses
+v_fact_expenses;ExpenseType;nvarchar; type of expense; Expenses
+v_fact_expenses;ExpenseDetail;nvarchar; detail of expense; Expenses
+v_fact_expenses;Currency;nvarchar; currency of expense; Expenses
+v_fact_expenses;ExpenseAmount;decimal; expense amount; Expenses
+v_fact_expenses;CreateDate;datetime; create date of expense; Expenses
