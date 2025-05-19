@@ -183,7 +183,7 @@ class VectorStore:
         self,
         ids: List[str] = None,
         metadata_filter: dict = None,
-        delete_all: bool = False,
+        delete_all: bool = True,
     ) -> None:
         """Delete records from the vector database.
 

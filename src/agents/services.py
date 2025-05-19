@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from langgraph.graph.state import CompiledStateGraph
 from collections.abc import AsyncGenerator
 from agents.search_agent import search_graph
-from agents.data_analysis_agent import data_analysis_graph
+from src.agents.data_analysis_agent import data_analysis_graph
 from agents.utils import langchain_to_chat_message
 import json
 

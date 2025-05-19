@@ -72,13 +72,15 @@ def extract_deepseek_response_from_tag(response: str, tag: Optional[str] = None)
     """
     Extract the deepseek response from the <deepseek> tag
     """
-    result = response.split("</think>")[1]
+    # Split on </think> and take the part after it
+    parts = response.split("</think>")
+    if len(parts) < 2:
+        return response  # or raise an error
+    result = parts[1]
     if tag is None:
-        return result
+        return result.strip()
     pattern = rf"<{tag}>(.*?)</{tag}>"
-    match = re.search(pattern, response, re.DOTALL)
+    match = re.search(pattern, result, re.DOTALL)
     if match:
-        extracted_content = match.group(1).strip()
-        return extracted_content
-
-    return result
+        return match.group(1).strip()
+    return result.strip()
